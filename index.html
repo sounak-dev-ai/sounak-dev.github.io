@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sounak Dey — AI & Computational Biology Engineer</title>
+  <meta name="description" content="Freelance AI/ML Engineer specializing in biomedical image analysis, deep learning pipelines, and scientific software for life sciences."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    /* ─── RESET & VARIABLES ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #050810;
+      --bg2:       #080d1a;
+      --bg3:       #0c1425;
+      --surface:   #0f1b2e;
+      --border:    rgba(0,210,180,0.12);
+      --accent:    #00d2b4;
+      --accent2:   #00a8ff;
+      --accent3:   #7b61ff;
+      --text:      #c8d8e8;
+      --text-dim:  #6a80a0;
+      --text-hi:   #eef4ff;
+      --glow:      0 0 30px rgba(0,210,180,0.18);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lora', Georgia, serif;
+      font-size: 16px;
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+    ::selection { background: rgba(0,210,180,0.25); }
+    a { color: var(--accent); text-decoration: none; transition: color .2s; }
+    a:hover { color: var(--accent2); }
+    img { display: block; max-width: 100%; }
+
+    /* ─── CANVAS BACKGROUND ─────────────────────────────── */
+    #bg-canvas {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; opacity: 0.55;
+    }
+
+    /* ─── LAYOUT ─────────────────────────────────────────── */
+    .wrapper { position: relative; z-index: 1; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+    section { padding: 6rem 0; }
+
+    /* ─── NAV ────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 1.2rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(5,8,16,0.75);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: background .4s;
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.15rem;
+      color: var(--text-hi); letter-spacing: -0.02em;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem; letter-spacing: 0.08em;
+      color: var(--text-dim); text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-cta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem; letter-spacing: 0.08em;
+      padding: 0.55rem 1.2rem;
+      border: 1px solid var(--accent);
+      border-radius: 4px; color: var(--accent);
+      transition: background .2s, color .2s;
+    }
+    .nav-cta:hover { background: var(--accent); color: var(--bg); }
+
+    /* Hamburger */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span {
+      display: block; width: 24px; height: 2px;
+      background: var(--text); transition: .3s;
+    }
+    .mobile-menu {
+      display: none; flex-direction: column; gap: 1.5rem;
+      position: fixed; top: 65px; left: 0; right: 0;
+      background: rgba(5,8,16,0.97);
+      padding: 2rem; z-index: 99;
+      border-bottom: 1px solid var(--border);
+    }
+    .mobile-menu a {
+      font-family: 'DM Mono', monospace; font-size: 0.9rem;
+      color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .mobile-menu.open { display: flex; }
+
+    /* ─── HERO ───────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh; display: flex; align-items: center;
+      padding-top: 80px;
+      position: relative;
+    }
+    .hero-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center;
+    }
+    .hero-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.15em;
+      color: var(--accent); text-transform: uppercase;
+      display: flex; align-items: center; gap: 0.6rem;
+      margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp .7s ease .2s forwards;
+    }
+    .hero-tag::before {
+      content: ''; display: block; width: 32px; height: 1px;
+      background: var(--accent);
+    }
+    .hero-h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 800; line-height: 1.1;
+      color: var(--text-hi); letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp .7s ease .35s forwards;
+    }
+    .hero-h1 em { font-style: normal; color: var(--accent); }
+    .hero-sub {
+      font-size: 1.05rem; color: var(--text-dim);
+      max-width: 480px; line-height: 1.8;
+      margin-bottom: 2.5rem;
+      opacity: 0; animation: fadeUp .7s ease .5s forwards;
+    }
+    .hero-btns {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp .7s ease .65s forwards;
+    }
+    .btn-primary {
+      padding: 0.85rem 2rem;
+      background: var(--accent); color: var(--bg);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem; font-weight: 500; letter-spacing: 0.06em;
+      border-radius: 4px; transition: box-shadow .2s, transform .2s;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 24px rgba(0,210,180,0.4);
+      transform: translateY(-2px); color: var(--bg);
+    }
+    .btn-outline {
+      padding: 0.85rem 2rem;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem; letter-spacing: 0.06em;
+      border-radius: 4px; transition: border-color .2s, color .2s;
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Hero visual */
+    .hero-visual {
+      display: flex; justify-content: center; align-items: center;
+      opacity: 0; animation: fadeIn 1.2s ease .5s forwards;
+    }
+    .cell-ring {
+      width: 340px; height: 340px; border-radius: 50%;
+      border: 1px solid rgba(0,210,180,0.2);
+      position: relative; display: flex; align-items: center; justify-content: center;
+      animation: spin 24s linear infinite;
+    }
+    .cell-ring::before {
+      content: ''; position: absolute; inset: 18px;
+      border-radius: 50%; border: 1px dashed rgba(0,168,255,0.2);
+      animation: spin 16s linear infinite reverse;
+    }
+    .cell-ring::after {
+      content: ''; position: absolute; inset: 50px;
+      border-radius: 50%; border: 1px solid rgba(123,97,255,0.2);
+    }
+    .cell-core {
+      width: 160px; height: 160px; border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, rgba(0,210,180,0.15), rgba(0,168,255,0.06) 60%, transparent);
+      border: 1px solid rgba(0,210,180,0.25);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; z-index: 2;
+      box-shadow: 0 0 60px rgba(0,210,180,0.08), inset 0 0 30px rgba(0,210,180,0.05);
+    }
+    .cell-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.12em;
+      color: var(--accent); text-align: center; text-transform: uppercase;
+      line-height: 1.8;
+    }
+    .orbit-dot {
+      position: absolute; width: 8px; height: 8px;
+      border-radius: 50%; background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+    }
+    .orbit-dot-1 { top: -4px; left: 50%; transform: translateX(-50%); }
+    .orbit-dot-2 { bottom: -4px; left: 50%; transform: translateX(-50%); background: var(--accent2); box-shadow: 0 0 12px var(--accent2); }
+    .orbit-dot-3 { left: -4px; top: 50%; transform: translateY(-50%); background: var(--accent3); box-shadow: 0 0 12px var(--accent3); }
+
+    /* Stats bar */
+    .hero-stats {
+      display: flex; gap: 2.5rem; margin-top: 3rem; padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      opacity: 0; animation: fadeUp .7s ease .8s forwards;
+    }
+    .stat-item { display: flex; flex-direction: column; gap: 0.2rem; }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem; font-weight: 700; color: var(--text-hi);
+    }
+    .stat-num span { color: var(--accent); }
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.1em; color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    /* ─── SECTION HEADERS ────────────────────────────────── */
+    .section-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.18em;
+      color: var(--accent); text-transform: uppercase;
+      display: flex; align-items: center; gap: 0.6rem;
+      margin-bottom: 0.8rem;
+    }
+    .section-tag::before {
+      content: ''; display: block; width: 24px; height: 1px;
+      background: var(--accent);
+    }
+    .section-h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 700; color: var(--text-hi);
+      letter-spacing: -0.02em; line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    .section-lead {
+      font-size: 1rem; color: var(--text-dim);
+      max-width: 560px; line-height: 1.8;
+    }
+
+    /* ─── ABOUT ──────────────────────────────────────────── */
+    #about { background: var(--bg2); }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1.4fr;
+      gap: 5rem; align-items: center;
+    }
+    .about-avatar-wrap {
+      position: relative;
+    }
+    .about-avatar-bg {
+      width: 280px; height: 280px; border-radius: 2px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .about-avatar-bg::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(0,210,180,0.08), transparent 60%);
+    }
+    .avatar-initials {
+      font-family: 'Syne', sans-serif;
+      font-size: 4rem; font-weight: 800;
+      color: rgba(0,210,180,0.3); letter-spacing: -0.05em;
+    }
+    .about-badge {
+      position: absolute; bottom: -1rem; right: -1rem;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 0.8rem 1.2rem; border-radius: 4px;
+      box-shadow: var(--glow);
+    }
+    .badge-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem; font-weight: 700; color: var(--accent);
+    }
+    .badge-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.1em; color: var(--text-dim);
+      text-transform: uppercase;
+    }
+    .about-text h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem; font-weight: 700; color: var(--text-hi);
+      margin-bottom: 1.2rem;
+    }
+    .about-text p {
+      color: var(--text-dim); margin-bottom: 1rem; line-height: 1.85;
+    }
+    .about-chips {
+      display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.5rem;
+    }
+    .chip {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.08em;
+      padding: 0.35rem 0.85rem; border-radius: 2px;
+      border: 1px solid var(--border);
+      color: var(--text-dim); background: var(--surface);
+      text-transform: uppercase;
+    }
+
+    /* ─── SERVICES ───────────────────────────────────────── */
+    #services {}
+    .services-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px; background: var(--border);
+      border: 1px solid var(--border); border-radius: 6px;
+      overflow: hidden; margin-top: 3rem;
+    }
+    .service-card {
+      background: var(--bg);
+      padding: 2.2rem;
+      transition: background .3s;
+      position: relative;
+    }
+    .service-card:hover { background: var(--surface); }
+    .service-card:hover .service-icon { color: var(--accent); box-shadow: var(--glow); }
+    .service-icon {
+      font-size: 1.5rem; margin-bottom: 1.2rem;
+      width: 48px; height: 48px; border-radius: 6px;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      transition: box-shadow .3s, color .3s;
+    }
+    .service-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      color: var(--text-hi); margin-bottom: 0.8rem;
+    }
+    .service-card p {
+      font-size: 0.88rem; color: var(--text-dim); line-height: 1.75;
+    }
+    .service-tag {
+      display: inline-block; margin-top: 1.2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.1em;
+      color: var(--accent); text-transform: uppercase;
+    }
+
+    /* ─── PROJECTS ───────────────────────────────────────── */
+    #projects { background: var(--bg2); }
+    .projects-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .filter-tabs {
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+    }
+    .filter-tab {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 0.4rem 0.9rem; border-radius: 2px;
+      border: 1px solid var(--border);
+      color: var(--text-dim); cursor: pointer;
+      transition: border-color .2s, color .2s, background .2s;
+      background: none;
+    }
+    .filter-tab:hover, .filter-tab.active {
+      border-color: var(--accent); color: var(--accent);
+      background: rgba(0,210,180,0.06);
+    }
+    .projects-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.2rem;
+    }
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px; padding: 1.8rem;
+      transition: border-color .3s, transform .3s, box-shadow .3s;
+      cursor: pointer; position: relative; overflow: hidden;
+    }
+    .project-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .3s;
+    }
+    .project-card:hover { border-color: rgba(0,210,180,0.3); transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
+    .project-card:hover::before { transform: scaleX(1); }
+    .project-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem;
+    }
+    .project-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em;
+    }
+    .project-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.2rem 0.6rem; border-radius: 2px;
+    }
+    .badge-bio { background: rgba(0,210,180,0.1); color: var(--accent); border: 1px solid rgba(0,210,180,0.2); }
+    .badge-ai { background: rgba(0,168,255,0.1); color: var(--accent2); border: 1px solid rgba(0,168,255,0.2); }
+    .badge-fullstack { background: rgba(123,97,255,0.1); color: var(--accent3); border: 1px solid rgba(123,97,255,0.2); }
+    .badge-data { background: rgba(255,165,0,0.1); color: #ffaa00; border: 1px solid rgba(255,165,0,0.2); }
+    .project-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.02rem; font-weight: 700;
+      color: var(--text-hi); margin-bottom: 0.6rem; line-height: 1.3;
+    }
+    .project-card p {
+      font-size: 0.85rem; color: var(--text-dim); line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+    .project-stack {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.2rem;
+    }
+    .stack-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.06em;
+      padding: 0.2rem 0.5rem; border-radius: 2px;
+      background: var(--bg3); color: var(--text-dim);
+      border: 1px solid var(--border);
+    }
+    .project-links { display: flex; gap: 1rem; }
+    .project-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-dim);
+      display: flex; align-items: center; gap: 0.3rem;
+      transition: color .2s;
+    }
+    .project-link:hover { color: var(--accent); }
+    .project-link svg { width: 12px; height: 12px; }
+
+    /* ─── SKILLS ─────────────────────────────────────────── */
+    #skills {}
+    .skills-layout {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5rem; align-items: start; margin-top: 3rem;
+    }
+    .skills-group { margin-bottom: 2.5rem; }
+    .skills-group-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1.2rem;
+    }
+    .skill-bar { margin-bottom: 1rem; }
+    .skill-bar-header {
+      display: flex; justify-content: space-between;
+      margin-bottom: 0.4rem;
+    }
+    .skill-name {
+      font-size: 0.88rem; color: var(--text);
+    }
+    .skill-pct {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; color: var(--text-dim);
+    }
+    .skill-track {
+      height: 3px; background: var(--surface);
+      border-radius: 2px; overflow: hidden;
+    }
+    .skill-fill {
+      height: 100%; border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      width: 0; transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .tools-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+    }
+    .tool-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 4px; padding: 0.8rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.05em;
+      color: var(--text-dim); text-align: center;
+      transition: border-color .2s, color .2s;
+    }
+    .tool-item:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ─── CONTACT ────────────────────────────────────────── */
+    #contact { background: var(--bg2); }
+    .contact-inner {
+      display: grid; grid-template-columns: 1fr 1.2fr;
+      gap: 5rem; align-items: start;
+    }
+    .contact-info h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--text-hi); margin-bottom: 1rem;
+    }
+    .contact-info p {
+      color: var(--text-dim); font-size: 0.92rem; line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+    .contact-links { display: flex; flex-direction: column; gap: 1rem; }
+    .contact-link-item {
+      display: flex; align-items: center; gap: 0.8rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem; color: var(--text-dim);
+      transition: color .2s;
+    }
+    .contact-link-item:hover { color: var(--accent); }
+    .contact-link-icon {
+      width: 36px; height: 36px; border-radius: 4px;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+    }
+    /* Form */
+    .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); border-radius: 4px;
+      padding: 0.85rem 1rem;
+      font-family: 'Lora', serif; font-size: 0.9rem;
+      outline: none; transition: border-color .2s;
+      width: 100%;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus { border-color: var(--accent); }
+    .form-group textarea { min-height: 130px; resize: vertical; }
+    .form-group select option { background: var(--bg2); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-submit {
+      padding: 0.9rem 2rem; background: var(--accent);
+      color: var(--bg); border: none; border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem; font-weight: 500; letter-spacing: 0.08em;
+      cursor: pointer; transition: box-shadow .2s, transform .2s;
+      text-transform: uppercase; align-self: flex-start;
+    }
+    .form-submit:hover {
+      box-shadow: 0 0 24px rgba(0,210,180,0.4);
+      transform: translateY(-2px);
+    }
+    .form-note {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; color: var(--text-dim); margin-top: 0.2rem;
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────── */
+    footer {
+      padding: 2rem; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-copy {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.05em;
+    }
+    .footer-copy span { color: var(--accent); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── SCROLLBAR ──────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,210,180,0.3); border-radius: 2px; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .about-grid { grid-template-columns: 1fr; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .skills-layout { grid-template-columns: 1fr; gap: 2rem; }
+      .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 4rem 0; }
+      .services-grid { grid-template-columns: 1fr; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 1.5rem; flex-wrap: wrap; }
+      .form-row { grid-template-columns: 1fr; }
+      .tools-grid { grid-template-columns: repeat(2,1fr); }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrapper">
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-logo">SD<span>.</span></div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Hire Me</a>
+    <div class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#about" onclick="closeMobileMenu()">About</a>
+    <a href="#services" onclick="closeMobileMenu()">Services</a>
+    <a href="#projects" onclick="closeMobileMenu()">Projects</a>
+    <a href="#skills" onclick="closeMobileMenu()">Skills</a>
+    <a href="#contact" onclick="closeMobileMenu()">Contact</a>
+  </div>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <div class="hero-tag">Available for freelance work</div>
+          <h1 class="hero-h1">
+            AI Engineer<br/>for <em>Life Sciences</em><br/>&amp; Beyond
+          </h1>
+          <p class="hero-sub">
+            I build deep learning pipelines, biomedical image analysis tools, and AI-powered software for biotech startups, research labs, and forward-thinking teams.
+          </p>
+          <div class="hero-btns">
+            <a href="#projects" class="btn-primary">View Projects</a>
+            <a href="#contact" class="btn-outline">Let's Talk</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-item">
+              <div class="stat-num">20<span>+</span></div>
+              <div class="stat-label">Projects Built</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">5<span>+</span></div>
+              <div class="stat-label">Years Experience</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">3<span>+</span></div>
+              <div class="stat-label">Research Papers</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="cell-ring">
+            <div class="orbit-dot orbit-dot-1"></div>
+            <div class="orbit-dot orbit-dot-2"></div>
+            <div class="orbit-dot orbit-dot-3"></div>
+            <div class="cell-core">
+              <div class="cell-label">Deep<br/>Learning<br/>+<br/>Biology</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-avatar-wrap reveal">
+          <div class="about-avatar-bg">
+            <div class="avatar-initials">SD</div>
+          </div>
+          <div class="about-badge">
+            <div class="badge-num">AI</div>
+            <div class="badge-label">Researcher + Engineer</div>
+          </div>
+        </div>
+        <div class="about-text reveal">
+          <div class="section-tag">About Me</div>
+          <h2 class="section-h2">Computational Biologist<br/>turned AI Engineer</h2>
+          <p>
+            I'm a computational biologist and deep learning engineer with deep expertise in biomedical image analysis — from histopathology classification to morphological feature extraction at the cellular level.
+          </p>
+          <p>
+            My research background spans automated staging of seminiferous tubules using CNNs, building rule-based morphological classifiers, and engineering reproducible scientific ML pipelines. I translate complex biology into precise, deployable software.
+          </p>
+          <p>
+            As a freelancer, I work with biotech startups, academic labs, and technology companies who need AI that actually works in a scientific context — not just demos.
+          </p>
+          <div class="about-chips">
+            <span class="chip">Deep Learning</span>
+            <span class="chip">Histopathology AI</span>
+            <span class="chip">Image Analysis</span>
+            <span class="chip">LLM Engineering</span>
+            <span class="chip">Python</span>
+            <span class="chip">PyTorch</span>
+            <span class="chip">FastAPI</span>
+            <span class="chip">React</span>
+            <span class="chip">Docker</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-tag">What I Offer</div>
+        <h2 class="section-h2">Services</h2>
+        <p class="section-lead">From research prototypes to production systems — I build the full stack.</p>
+      </div>
+      <div class="services-grid reveal">
+        <div class="service-card">
+          <div class="service-icon">🔬</div>
+          <h3>Biomedical Image Analysis</h3>
+          <p>CNN-based classifiers for histopathology slides, cell segmentation, morphological feature extraction, and automated QC pipelines for microscopy data.</p>
+          <span class="service-tag">→ PyTorch · OpenCV · MONAI</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">🤖</div>
+          <h3>LLM & AI Application Development</h3>
+          <p>RAG systems, document Q&A tools, multi-agent pipelines, and custom chatbots with domain-specific knowledge bases for scientific and enterprise use.</p>
+          <span class="service-tag">→ LangChain · OpenAI · FastAPI</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">🧪</div>
+          <h3>ML Pipeline Engineering</h3>
+          <p>End-to-end reproducible ML pipelines: data preprocessing, model training, evaluation, explainability (Grad-CAM, SHAP), and cloud deployment.</p>
+          <span class="service-tag">→ MLflow · Docker · AWS/GCP</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">📊</div>
+          <h3>Scientific Data Analysis</h3>
+          <p>Statistical analysis, clustering (PCA, t-SNE, UMAP), survival analysis, scRNA-seq data processing, and publication-quality visualization dashboards.</p>
+          <span class="service-tag">→ Python · R · Plotly · Seaborn</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">⚙️</div>
+          <h3>Full-Stack AI Web Apps</h3>
+          <p>Production-ready web applications with AI backends — from image upload interfaces to real-time dashboards with authentication and database integration.</p>
+          <span class="service-tag">→ React · FastAPI · PostgreSQL</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">📝</div>
+          <h3>Research & Technical Consulting</h3>
+          <p>Architecture review, model selection, experimental design for AI research projects, and technical writing for grant proposals and research papers.</p>
+          <span class="service-tag">→ Strategy · Writing · Review</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="container">
+      <div class="projects-header reveal">
+        <div>
+          <div class="section-tag">Portfolio</div>
+          <h2 class="section-h2">Projects</h2>
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-filter="all">All</button>
+          <button class="filter-tab" data-filter="bio">Biomedical</button>
+          <button class="filter-tab" data-filter="ai">AI / LLM</button>
+          <button class="filter-tab" data-filter="fullstack">Full-Stack</button>
+          <button class="filter-tab" data-filter="data">Data Science</button>
+        </div>
+      </div>
+
+      <div class="projects-grid" id="projects-grid">
+
+        <!-- BIOMEDICAL -->
+        <div class="project-card reveal" data-cat="bio">
+          <div class="project-meta">
+            <span class="project-num">01</span>
+            <span class="project-badge badge-bio">Biomedical</span>
+          </div>
+          <h3>Histology Image Classifier</h3>
+          <p>CNN classifier trained on TCGA H&amp;E stained slides to distinguish tumor vs. normal tissue with 94% accuracy using ResNet-50 and Grad-CAM explainability.</p>
+          <div class="project-stack">
+            <span class="stack-tag">PyTorch</span>
+            <span class="stack-tag">ResNet-50</span>
+            <span class="stack-tag">Grad-CAM</span>
+            <span class="stack-tag">Streamlit</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+            <a href="#" class="project-link">↗ Live Demo</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="bio">
+          <div class="project-meta">
+            <span class="project-num">02</span>
+            <span class="project-badge badge-bio">Biomedical</span>
+          </div>
+          <h3>Cell Segmentation with U-Net</h3>
+          <p>Semantic segmentation of nuclei and cytoplasm regions in fluorescence microscopy images using a custom U-Net with attention gates, achieving IoU &gt;0.91.</p>
+          <div class="project-stack">
+            <span class="stack-tag">PyTorch</span>
+            <span class="stack-tag">U-Net</span>
+            <span class="stack-tag">OpenCV</span>
+            <span class="stack-tag">Albumentations</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="bio">
+          <div class="project-meta">
+            <span class="project-num">03</span>
+            <span class="project-badge badge-bio">Biomedical</span>
+          </div>
+          <h3>Spermatogenesis Stage Predictor</h3>
+          <p>Automated staging of mouse seminiferous tubules from bright-field He-PAS stained histology images using ResNeXt-50 with 12-class classification and Grad-CAM visualization.</p>
+          <div class="project-stack">
+            <span class="stack-tag">PyTorch</span>
+            <span class="stack-tag">ResNeXt</span>
+            <span class="stack-tag">He-PAS</span>
+            <span class="stack-tag">Grad-CAM</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+            <a href="#" class="project-link">↗ Paper</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="bio">
+          <div class="project-meta">
+            <span class="project-num">04</span>
+            <span class="project-badge badge-bio">Biomedical</span>
+          </div>
+          <h3>Automated Cell Counter</h3>
+          <p>Automated detection and counting of cell types in microscopy images using YOLOv8 with custom training on annotated bright-field images. Replaces hours of manual counting.</p>
+          <div class="project-stack">
+            <span class="stack-tag">YOLOv8</span>
+            <span class="stack-tag">OpenCV</span>
+            <span class="stack-tag">FastAPI</span>
+            <span class="stack-tag">React</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="bio">
+          <div class="project-meta">
+            <span class="project-num">05</span>
+            <span class="project-badge badge-bio">Biomedical</span>
+          </div>
+          <h3>Morphological Feature Extractor</h3>
+          <p>Rule-based + ML hybrid pipeline extracting quantitative morphological features (N:C ratio, eccentricity, chromatin texture) from stained histology images for downstream staging.</p>
+          <div class="project-stack">
+            <span class="stack-tag">scikit-image</span>
+            <span class="stack-tag">OpenCV</span>
+            <span class="stack-tag">GLCM</span>
+            <span class="stack-tag">Python</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="bio">
+          <div class="project-meta">
+            <span class="project-num">06</span>
+            <span class="project-badge badge-bio">Biomedical</span>
+          </div>
+          <h3>Microscopy Image QC Classifier</h3>
+          <p>CNN-based quality control system for batch microscopy images — automatically flags out-of-focus, artifact-ridden, or low-SNR frames, reducing manual QC time by 80%.</p>
+          <div class="project-stack">
+            <span class="stack-tag">PyTorch</span>
+            <span class="stack-tag">EfficientNet</span>
+            <span class="stack-tag">FastAPI</span>
+            <span class="stack-tag">React</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <!-- AI / LLM -->
+        <div class="project-card reveal" data-cat="ai">
+          <div class="project-meta">
+            <span class="project-num">07</span>
+            <span class="project-badge badge-ai">AI / LLM</span>
+          </div>
+          <h3>Scientific Literature Reviewer</h3>
+          <p>Input a research topic → fetches PubMed papers → LLM ranks, clusters, and summarizes them → exports a structured markdown review draft. Saves weeks of manual screening.</p>
+          <div class="project-stack">
+            <span class="stack-tag">LangChain</span>
+            <span class="stack-tag">OpenAI</span>
+            <span class="stack-tag">PubMed API</span>
+            <span class="stack-tag">Streamlit</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+            <a href="#" class="project-link">↗ Demo</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="ai">
+          <div class="project-meta">
+            <span class="project-num">08</span>
+            <span class="project-badge badge-ai">AI / LLM</span>
+          </div>
+          <h3>Document Due Diligence Tool</h3>
+          <p>Upload multiple PDFs → LLM extracts key clauses, flags risks, compares documents side-by-side, and answers natural language questions. Built for legal and investment workflows.</p>
+          <div class="project-stack">
+            <span class="stack-tag">LangChain RAG</span>
+            <span class="stack-tag">Claude API</span>
+            <span class="stack-tag">React</span>
+            <span class="stack-tag">FastAPI</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="ai">
+          <div class="project-meta">
+            <span class="project-num">09</span>
+            <span class="project-badge badge-ai">AI / LLM</span>
+          </div>
+          <h3>Grant Proposal AI Assistant</h3>
+          <p>Input your research summary → generates NIH-formatted Specific Aims, Significance, and Innovation sections using structured LLM prompt chains. Exports editable DOCX.</p>
+          <div class="project-stack">
+            <span class="stack-tag">OpenAI</span>
+            <span class="stack-tag">LangChain</span>
+            <span class="stack-tag">python-docx</span>
+            <span class="stack-tag">React</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+            <a href="#" class="project-link">↗ Demo</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="ai">
+          <div class="project-meta">
+            <span class="project-num">10</span>
+            <span class="project-badge badge-ai">AI / LLM</span>
+          </div>
+          <h3>Multi-Agent Research Assistant</h3>
+          <p>A CrewAI-based multi-agent system: one agent searches the web, one reads PDFs, one extracts data tables, one synthesizes and writes a final structured research report.</p>
+          <div class="project-stack">
+            <span class="stack-tag">CrewAI</span>
+            <span class="stack-tag">LangGraph</span>
+            <span class="stack-tag">OpenAI</span>
+            <span class="stack-tag">Streamlit</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="ai">
+          <div class="project-meta">
+            <span class="project-num">11</span>
+            <span class="project-badge badge-ai">AI / LLM</span>
+          </div>
+          <h3>AI Pathology Report Generator</h3>
+          <p>Upload histology image → CNN classifies tissue type → GPT drafts a structured diagnostic report in clinical format. Bridges computer vision and clinical NLP.</p>
+          <div class="project-stack">
+            <span class="stack-tag">PyTorch</span>
+            <span class="stack-tag">GPT-4</span>
+            <span class="stack-tag">FastAPI</span>
+            <span class="stack-tag">React</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="ai">
+          <div class="project-meta">
+            <span class="project-num">12</span>
+            <span class="project-badge badge-ai">AI / LLM</span>
+          </div>
+          <h3>Voice-to-Structured Clinical Notes</h3>
+          <p>Clinician speaks patient notes → Whisper transcribes → LLM extracts structured fields (diagnosis, medications, dates, symptoms) → exports as JSON/CSV for EHR integration.</p>
+          <div class="project-stack">
+            <span class="stack-tag">Whisper</span>
+            <span class="stack-tag">GPT-4</span>
+            <span class="stack-tag">FastAPI</span>
+            <span class="stack-tag">React</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <!-- FULL-STACK -->
+        <div class="project-card reveal" data-cat="fullstack">
+          <div class="project-meta">
+            <span class="project-num">13</span>
+            <span class="project-badge badge-fullstack">Full-Stack</span>
+          </div>
+          <h3>No-Code AI Model Trainer</h3>
+          <p>Browser-based SaaS tool where non-technical users upload labeled images, trigger cloud CNN training with one click, monitor progress, evaluate, and download the trained model.</p>
+          <div class="project-stack">
+            <span class="stack-tag">React</span>
+            <span class="stack-tag">FastAPI</span>
+            <span class="stack-tag">PyTorch</span>
+            <span class="stack-tag">Celery</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+            <a href="#" class="project-link">↗ Live</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="fullstack">
+          <div class="project-meta">
+            <span class="project-num">14</span>
+            <span class="project-badge badge-fullstack">Full-Stack</span>
+          </div>
+          <h3>Lab Experiment Tracker + AI Insights</h3>
+          <p>Web app for logging experiments (parameters, outcomes, notes) with AI that detects patterns, flags anomalies, and suggests next experiment configurations based on history.</p>
+          <div class="project-stack">
+            <span class="stack-tag">React</span>
+            <span class="stack-tag">FastAPI</span>
+            <span class="stack-tag">PostgreSQL</span>
+            <span class="stack-tag">OpenAI</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="fullstack">
+          <div class="project-meta">
+            <span class="project-num">15</span>
+            <span class="project-badge badge-fullstack">Full-Stack</span>
+          </div>
+          <h3>Browser-Based Image Annotation Tool</h3>
+          <p>Zero-install web app for annotating microscopy images with bounding boxes, polygon masks, and class labels. Exports COCO/YOLO format JSON. Supports multi-user projects.</p>
+          <div class="project-stack">
+            <span class="stack-tag">React</span>
+            <span class="stack-tag">Konva.js</span>
+            <span class="stack-tag">FastAPI</span>
+            <span class="stack-tag">SQLite</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+            <a href="#" class="project-link">↗ Live</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="fullstack">
+          <div class="project-meta">
+            <span class="project-num">16</span>
+            <span class="project-badge badge-fullstack">Full-Stack</span>
+          </div>
+          <h3>Production REST API with Auth</h3>
+          <p>Template for production-ready FastAPI backend: JWT authentication, role-based access control, rate limiting, PostgreSQL with Alembic migrations, Dockerized, CI/CD ready.</p>
+          <div class="project-stack">
+            <span class="stack-tag">FastAPI</span>
+            <span class="stack-tag">PostgreSQL</span>
+            <span class="stack-tag">Docker</span>
+            <span class="stack-tag">JWT</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <!-- DATA SCIENCE -->
+        <div class="project-card reveal" data-cat="data">
+          <div class="project-meta">
+            <span class="project-num">17</span>
+            <span class="project-badge badge-data">Data Science</span>
+          </div>
+          <h3>Gene Expression Clustering Dashboard</h3>
+          <p>Interactive PCA, t-SNE, and UMAP clustering of public scRNA-seq datasets with cell-type annotation, differential expression analysis, and Plotly-powered interactive visualizations.</p>
+          <div class="project-stack">
+            <span class="stack-tag">Scanpy</span>
+            <span class="stack-tag">UMAP</span>
+            <span class="stack-tag">Plotly</span>
+            <span class="stack-tag">Streamlit</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+            <a href="#" class="project-link">↗ Demo</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="data">
+          <div class="project-meta">
+            <span class="project-num">18</span>
+            <span class="project-badge badge-data">Data Science</span>
+          </div>
+          <h3>Clinical Trial Analyzer</h3>
+          <p>Upload trial CSV → auto-runs survival analysis (Kaplan-Meier, Cox regression), group comparisons, adverse event summaries, and generates a publication-ready HTML/PDF report.</p>
+          <div class="project-stack">
+            <span class="stack-tag">lifelines</span>
+            <span class="stack-tag">scipy</span>
+            <span class="stack-tag">Plotly</span>
+            <span class="stack-tag">ReportLab</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="data">
+          <div class="project-meta">
+            <span class="project-num">19</span>
+            <span class="project-badge badge-data">Data Science</span>
+          </div>
+          <h3>Grad-CAM Explainability Visualizer</h3>
+          <p>Universal Grad-CAM/GradCAM++ visualizer for any PyTorch CNN — upload a model and image, select a layer, and get a high-resolution heatmap overlay showing what the model attends to.</p>
+          <div class="project-stack">
+            <span class="stack-tag">PyTorch</span>
+            <span class="stack-tag">Grad-CAM</span>
+            <span class="stack-tag">Streamlit</span>
+            <span class="stack-tag">OpenCV</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+            <a href="#" class="project-link">↗ Demo</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal" data-cat="data">
+          <div class="project-meta">
+            <span class="project-num">20</span>
+            <span class="project-badge badge-data">Data Science</span>
+          </div>
+          <h3>Automated EDA Report Generator</h3>
+          <p>Upload any CSV → tool automatically generates a comprehensive HTML report with distribution plots, correlation heatmaps, missing value analysis, outlier detection, and statistical summaries.</p>
+          <div class="project-stack">
+            <span class="stack-tag">pandas</span>
+            <span class="stack-tag">Plotly</span>
+            <span class="stack-tag">ydata-profiling</span>
+            <span class="stack-tag">FastAPI</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/YOUR_USERNAME" class="project-link" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+            <a href="#" class="project-link">↗ Demo</a>
+          </div>
+        </div>
+
+      </div><!-- /projects-grid -->
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-tag">Technical Expertise</div>
+        <h2 class="section-h2">Skills</h2>
+      </div>
+      <div class="skills-layout">
+        <div class="reveal">
+          <div class="skills-group">
+            <div class="skills-group-title">Machine Learning & AI</div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">Deep Learning (PyTorch)</span><span class="skill-pct">95%</span></div><div class="skill-track"><div class="skill-fill" data-pct="95"></div></div></div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">Computer Vision (OpenCV, MONAI)</span><span class="skill-pct">90%</span></div><div class="skill-track"><div class="skill-fill" data-pct="90"></div></div></div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">LLM Engineering (LangChain)</span><span class="skill-pct">85%</span></div><div class="skill-track"><div class="skill-fill" data-pct="85"></div></div></div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">Scikit-learn / XGBoost</span><span class="skill-pct">88%</span></div><div class="skill-track"><div class="skill-fill" data-pct="88"></div></div></div>
+          </div>
+          <div class="skills-group">
+            <div class="skills-group-title">Software Engineering</div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">Python</span><span class="skill-pct">95%</span></div><div class="skill-track"><div class="skill-fill" data-pct="95"></div></div></div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">FastAPI / REST APIs</span><span class="skill-pct">85%</span></div><div class="skill-track"><div class="skill-fill" data-pct="85"></div></div></div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">React / JavaScript</span><span class="skill-pct">78%</span></div><div class="skill-track"><div class="skill-fill" data-pct="78"></div></div></div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">Docker / Cloud (AWS, GCP)</span><span class="skill-pct">80%</span></div><div class="skill-track"><div class="skill-fill" data-pct="80"></div></div></div>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="skills-group">
+            <div class="skills-group-title">Domain Knowledge</div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">Histopathology Image Analysis</span><span class="skill-pct">97%</span></div><div class="skill-track"><div class="skill-fill" data-pct="97"></div></div></div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">Computational Biology</span><span class="skill-pct">93%</span></div><div class="skill-track"><div class="skill-fill" data-pct="93"></div></div></div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">Bioinformatics / scRNA-seq</span><span class="skill-pct">80%</span></div><div class="skill-track"><div class="skill-fill" data-pct="80"></div></div></div>
+            <div class="skill-bar"><div class="skill-bar-header"><span class="skill-name">Statistical Analysis (R, Python)</span><span class="skill-pct">85%</span></div><div class="skill-track"><div class="skill-fill" data-pct="85"></div></div></div>
+          </div>
+          <div class="skills-group">
+            <div class="skills-group-title">Tools & Frameworks</div>
+            <div class="tools-grid">
+              <div class="tool-item">PyTorch</div>
+              <div class="tool-item">OpenCV</div>
+              <div class="tool-item">LangChain</div>
+              <div class="tool-item">FastAPI</div>
+              <div class="tool-item">React</div>
+              <div class="tool-item">Docker</div>
+              <div class="tool-item">MLflow</div>
+              <div class="tool-item">Streamlit</div>
+              <div class="tool-item">PostgreSQL</div>
+              <div class="tool-item">Scanpy</div>
+              <div class="tool-item">Plotly</div>
+              <div class="tool-item">Git</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-tag">Get In Touch</div>
+        <h2 class="section-h2">Let's Work Together</h2>
+        <p class="section-lead" style="margin-bottom:3rem;">Have a project in mind? I'm open to freelance engagements, collaborations, and consulting work.</p>
+      </div>
+      <div class="contact-inner reveal">
+        <div class="contact-info">
+          <h3>Availability</h3>
+          <p>Currently available for part-time freelance projects. Typical response time is within 24 hours. I work with clients globally.</p>
+          <div class="contact-links">
+            <a href="mailto:your.email@gmail.com" class="contact-link-item">
+              <div class="contact-link-icon">✉</div>
+              your.email@gmail.com
+            </a>
+            <a href="https://linkedin.com/in/YOUR_LINKEDIN" class="contact-link-item" target="_blank">
+              <div class="contact-link-icon">in</div>
+              linkedin.com/in/yourname
+            </a>
+            <a href="https://github.com/YOUR_USERNAME" class="contact-link-item" target="_blank">
+              <div class="contact-link-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              </div>
+              github.com/yourusername
+            </a>
+            <a href="https://upwork.com/freelancers/YOUR_ID" class="contact-link-item" target="_blank">
+              <div class="contact-link-icon">Up</div>
+              Upwork Profile
+            </a>
+          </div>
+        </div>
+
+        <div class="contact-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" placeholder="Dr. Jane Smith" />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" placeholder="jane@biotech.com" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Project Type</label>
+            <select>
+              <option value="">Select a service...</option>
+              <option>Biomedical Image Analysis</option>
+              <option>LLM / AI Application</option>
+              <option>ML Pipeline Engineering</option>
+              <option>Scientific Data Analysis</option>
+              <option>Full-Stack AI Web App</option>
+              <option>Research Consulting</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea placeholder="Describe your project, goals, and timeline..."></textarea>
+          </div>
+          <button class="form-submit" onclick="handleSubmit()">Send Message →</button>
+          <p class="form-note">* This form uses Formspree. Replace action URL in the JS with your Formspree endpoint.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-copy">
+      © 2025 <span>Sounak Dey</span> — AI & Computational Biology Engineer
+    </div>
+    <div class="footer-links">
+      <a href="#hero">Top</a>
+      <a href="https://github.com/YOUR_USERNAME" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/YOUR_LINKEDIN" target="_blank">LinkedIn</a>
+      <a href="mailto:your.email@gmail.com">Email</a>
+    </div>
+  </footer>
+
+</div><!-- /wrapper -->
+
+<script>
+  /* ── PARTICLE BACKGROUND ──────────────────────────── */
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      this.x  = Math.random() * W;
+      this.y  = Math.random() * H;
+      this.r  = Math.random() * 1.4 + 0.3;
+      this.vx = (Math.random() - 0.5) * 0.25;
+      this.vy = (Math.random() - 0.5) * 0.25;
+      this.a  = Math.random() * 0.5 + 0.1;
+      const palette = ['0,210,180','0,168,255','123,97,255'];
+      this.color = palette[Math.floor(Math.random()*palette.length)];
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy;
+      if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${this.color},${this.a})`;
+      ctx.fill();
+    }
+  }
+
+  function initParticles() {
+    particles = [];
+    const n = Math.min(Math.floor(W*H/8000), 140);
+    for (let i=0;i<n;i++) particles.push(new Particle());
+  }
+
+  function drawConnections() {
+    for (let i=0;i<particles.length;i++) {
+      for (let j=i+1;j<particles.length;j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d  = Math.sqrt(dx*dx+dy*dy);
+        if (d < 90) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(0,210,180,${0.06*(1-d/90)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0,0,W,H);
+    drawConnections();
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('resize', () => { resize(); initParticles(); });
+  resize(); initParticles(); animate();
+
+  /* ── NAVBAR SCROLL ──────────────────────────────── */
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').style.background =
+      window.scrollY > 60 ? 'rgba(5,8,16,0.95)' : 'rgba(5,8,16,0.75)';
+  });
+
+  /* ── HAMBURGER ──────────────────────────────────── */
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('mobile-menu').classList.toggle('open');
+  });
+  function closeMobileMenu() {
+    document.getElementById('mobile-menu').classList.remove('open');
+  }
+
+  /* ── SCROLL REVEAL ──────────────────────────────── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  /* ── SKILL BARS ─────────────────────────────────── */
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.skill-fill').forEach(fill => {
+          fill.style.width = fill.dataset.pct + '%';
+        });
+        barObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('.skills-layout').forEach(el => barObserver.observe(el));
+
+  /* ── PROJECT FILTERS ────────────────────────────── */
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const filter = tab.dataset.filter;
+      document.querySelectorAll('.project-card').forEach(card => {
+        const show = filter === 'all' || card.dataset.cat === filter;
+        card.style.display = show ? 'block' : 'none';
+      });
+    });
+  });
+
+  /* ── CONTACT FORM ───────────────────────────────── */
+  function handleSubmit() {
+    const btn = document.querySelector('.form-submit');
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+    // Replace with your Formspree endpoint:
+    // fetch('https://formspree.io/f/YOUR_ID', { method:'POST', ... })
+    setTimeout(() => {
+      btn.textContent = 'Message Sent ✓';
+      btn.style.background = '#00a856';
+      setTimeout(() => {
+        btn.textContent = 'Send Message →';
+        btn.style.background = '';
+        btn.disabled = false;
+      }, 3000);
+    }, 1200);
+  }
+</script>
+</body>
+</html>

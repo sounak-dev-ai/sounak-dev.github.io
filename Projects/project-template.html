@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- ============================================================
+    INSTRUCTIONS: Replace every value marked with  ← EDIT THIS
+    before duplicating for a new project.
+  ================================================================ -->
+  <title>Histology Image Classifier — Sounak Dey</title>  <!-- ← EDIT THIS -->
+  <meta name="description" content="CNN classifier for tumor vs normal tissue detection on H&E stained histology slides using ResNet-50 and Grad-CAM explainability."/> <!-- ← EDIT THIS -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ─── VARIABLES ─────────────────────────────────────────── */
+    :root {
+      --bg:      #050810;
+      --bg2:     #080d1a;
+      --bg3:     #0c1425;
+      --surface: #0f1b2e;
+      --border:  rgba(0,210,180,0.12);
+      --accent:  #00d2b4;
+      --accent2: #00a8ff;
+      --accent3: #7b61ff;
+      --text:    #c8d8e8;
+      --dim:     #6a80a0;
+      --hi:      #eef4ff;
+      --glow:    0 0 30px rgba(0,210,180,0.18);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Lora', Georgia, serif;
+      font-size: 16px; line-height: 1.75; overflow-x: hidden;
+    }
+    ::selection { background: rgba(0,210,180,0.2); }
+    a { color: var(--accent); text-decoration: none; transition: color .2s; }
+    a:hover { color: var(--accent2); }
+
+    /* ─── CANVAS ─────────────────────────────────────────────── */
+    #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.4; }
+
+    /* ─── NAV ────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 1.1rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(5,8,16,0.82); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem;
+      color: var(--hi); letter-spacing: -0.02em;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-back {
+      font-family: 'DM Mono', monospace; font-size: 0.76rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--dim); display: flex; align-items: center; gap: 0.5rem;
+      transition: color .2s;
+    }
+    .nav-back:hover { color: var(--accent); }
+    .nav-back::before { content: '←'; }
+
+    /* ─── LAYOUT ─────────────────────────────────────────────── */
+    .wrapper { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+    section { padding: 3.5rem 0; }
+
+    /* ─── HERO ───────────────────────────────────────────────── */
+    #hero { padding-top: 110px; padding-bottom: 3rem; }
+    .breadcrumb {
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.12em; color: var(--dim); text-transform: uppercase;
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp .6s ease .1s forwards;
+    }
+    .breadcrumb span { color: var(--accent); }
+    .project-category {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: 'DM Mono', monospace; font-size: 0.72rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1.2rem;
+      opacity: 0; animation: fadeUp .6s ease .2s forwards;
+    }
+    .project-category::before { content:''; display:block; width:24px; height:1px; background:var(--accent); }
+    .project-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 800;
+      color: var(--hi); letter-spacing: -0.03em; line-height: 1.1;
+      margin-bottom: 1.2rem;
+      opacity: 0; animation: fadeUp .6s ease .3s forwards;
+    }
+    .project-tagline {
+      font-size: 1.08rem; color: var(--dim); line-height: 1.8;
+      max-width: 680px; margin-bottom: 2rem;
+      opacity: 0; animation: fadeUp .6s ease .45s forwards;
+    }
+    .hero-actions {
+      display: flex; gap: 0.9rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp .6s ease .55s forwards;
+    }
+    .btn-primary {
+      padding: 0.8rem 1.8rem; background: var(--accent); color: var(--bg);
+      font-family: 'DM Mono', monospace; font-size: 0.8rem;
+      font-weight: 500; letter-spacing: 0.06em; border-radius: 4px;
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .btn-primary:hover { box-shadow: 0 0 22px rgba(0,210,180,0.4); transform: translateY(-2px); color: var(--bg); }
+    .btn-outline {
+      padding: 0.8rem 1.8rem; border: 1px solid var(--border); color: var(--text);
+      font-family: 'DM Mono', monospace; font-size: 0.8rem;
+      letter-spacing: 0.06em; border-radius: 4px;
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ─── META STRIP ─────────────────────────────────────────── */
+    .meta-strip {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); border-radius: 6px;
+      overflow: hidden; margin: 2.5rem 0;
+      opacity: 0; animation: fadeUp .6s ease .65s forwards;
+    }
+    .meta-item {
+      background: var(--surface); padding: 1.2rem 1.4rem;
+    }
+    .meta-label {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim);
+      margin-bottom: 0.35rem;
+    }
+    .meta-value {
+      font-family: 'Syne', sans-serif; font-size: 0.95rem;
+      font-weight: 700; color: var(--hi);
+    }
+
+    /* ─── DEMO IMAGE / VIDEO ─────────────────────────────────── */
+    .demo-block {
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+      background: var(--surface); position: relative;
+      margin-bottom: 3rem;
+    }
+    .demo-block img { width: 100%; display: block; }
+    .demo-placeholder {
+      height: 360px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1rem;
+      background: var(--bg3);
+    }
+    .demo-placeholder-icon { font-size: 3rem; opacity: 0.4; }
+    .demo-placeholder-text {
+      font-family: 'DM Mono', monospace; font-size: 0.75rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim);
+    }
+    .demo-caption {
+      padding: 0.9rem 1.4rem; border-top: 1px solid var(--border);
+      font-family: 'DM Mono', monospace; font-size: 0.72rem;
+      letter-spacing: 0.06em; color: var(--dim);
+    }
+
+    /* ─── SECTION LABELS ─────────────────────────────────────── */
+    .section-tag {
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent);
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem;
+    }
+    .section-tag::before { content:''; display:block; width:20px; height:1px; background:var(--accent); }
+    .section-h2 {
+      font-family: 'Syne', sans-serif; font-size: 1.5rem;
+      font-weight: 700; color: var(--hi); letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    /* ─── PROBLEM / SOLUTION ─────────────────────────────────── */
+    .ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 3rem; }
+    .ps-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 1.8rem; position: relative; overflow: hidden;
+    }
+    .ps-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .ps-card.problem::before { background: #ff6b6b; }
+    .ps-card.solution::before { background: var(--accent); }
+    .ps-label {
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.8rem;
+    }
+    .ps-card.problem .ps-label { color: #ff6b6b; }
+    .ps-card.solution .ps-label { color: var(--accent); }
+    .ps-card p { font-size: 0.9rem; color: var(--dim); line-height: 1.8; }
+
+    /* ─── APPROACH / STEPS ───────────────────────────────────── */
+    .steps { margin-bottom: 3rem; }
+    .step {
+      display: flex; gap: 1.5rem; margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .step-num {
+      font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+      color: rgba(0,210,180,0.18); line-height: 1; min-width: 2.5rem;
+      padding-top: 0.1rem;
+    }
+    .step-content h4 {
+      font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700;
+      color: var(--hi); margin-bottom: 0.4rem;
+    }
+    .step-content p { font-size: 0.9rem; color: var(--dim); line-height: 1.75; }
+
+    /* ─── RESULTS ────────────────────────────────────────────── */
+    .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 3rem; }
+    .result-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 1.4rem; text-align: center;
+    }
+    .result-num {
+      font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+      color: var(--accent); line-height: 1; margin-bottom: 0.4rem;
+    }
+    .result-label {
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim);
+    }
+
+    /* ─── TECH STACK ─────────────────────────────────────────── */
+    .stack-section { margin-bottom: 3rem; }
+    .stack-groups { display: flex; flex-direction: column; gap: 1rem; }
+    .stack-row { display: flex; align-items: flex-start; gap: 1.2rem; }
+    .stack-row-label {
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim);
+      min-width: 110px; padding-top: 0.35rem;
+    }
+    .stack-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .stack-chip {
+      font-family: 'DM Mono', monospace; font-size: 0.72rem;
+      letter-spacing: 0.05em; padding: 0.35rem 0.85rem;
+      border-radius: 3px; border: 1px solid var(--border);
+      color: var(--accent2); background: rgba(0,168,255,0.06);
+    }
+
+    /* ─── CODE SNIPPET ───────────────────────────────────────── */
+    .code-block {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 6px; overflow: hidden; margin-bottom: 3rem;
+    }
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.7rem 1.2rem; border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .code-title {
+      font-family: 'DM Mono', monospace; font-size: 0.72rem;
+      letter-spacing: 0.08em; color: var(--dim);
+    }
+    .code-dots { display: flex; gap: 6px; }
+    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .code-dot:nth-child(1) { background: #ff5f57; }
+    .code-dot:nth-child(2) { background: #febc2e; }
+    .code-dot:nth-child(3) { background: #28c840; }
+    pre {
+      padding: 1.5rem; overflow-x: auto; font-size: 0.82rem;
+      line-height: 1.75; color: var(--text);
+    }
+    code { font-family: 'DM Mono', monospace; }
+    .kw  { color: #7b61ff; }
+    .fn  { color: var(--accent); }
+    .str { color: #ffd580; }
+    .cm  { color: var(--dim); font-style: italic; }
+    .nb  { color: var(--accent2); }
+
+    /* ─── GALLERY ────────────────────────────────────────────── */
+    .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 3rem; }
+    .gallery-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; overflow: hidden;
+    }
+    .gallery-placeholder {
+      height: 180px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.5rem;
+      background: var(--bg3);
+    }
+    .gallery-placeholder span { font-size: 1.8rem; opacity: 0.35; }
+    .gallery-caption {
+      padding: 0.7rem 1rem; font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.08em; color: var(--dim);
+      text-transform: uppercase;
+    }
+
+    /* ─── CHALLENGES ─────────────────────────────────────────── */
+    .challenges { margin-bottom: 3rem; }
+    .challenge-item {
+      display: flex; gap: 1rem; padding: 1.2rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; margin-bottom: 0.8rem;
+    }
+    .challenge-icon { font-size: 1.2rem; line-height: 1.6; }
+    .challenge-text h4 {
+      font-family: 'Syne', sans-serif; font-size: 0.92rem; font-weight: 700;
+      color: var(--hi); margin-bottom: 0.3rem;
+    }
+    .challenge-text p { font-size: 0.85rem; color: var(--dim); line-height: 1.7; }
+
+    /* ─── RELATED PROJECTS ───────────────────────────────────── */
+    .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 3rem; }
+    .related-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 1.4rem;
+      transition: border-color .3s, transform .3s;
+    }
+    .related-card:hover { border-color: rgba(0,210,180,0.3); transform: translateY(-3px); }
+    .related-num {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.1em; color: var(--dim); margin-bottom: 0.6rem;
+    }
+    .related-card h4 {
+      font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700;
+      color: var(--hi); margin-bottom: 0.4rem; line-height: 1.3;
+    }
+    .related-card p { font-size: 0.78rem; color: var(--dim); line-height: 1.65; }
+    .related-link {
+      display: inline-block; margin-top: 0.8rem;
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent);
+    }
+
+    /* ─── CTA ────────────────────────────────────────────────── */
+    .cta-block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 3rem; text-align: center; margin-bottom: 4rem;
+      position: relative; overflow: hidden;
+    }
+    .cta-block::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(0,210,180,0.06), transparent 70%);
+    }
+    .cta-block h3 {
+      font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 700;
+      color: var(--hi); margin-bottom: 0.8rem; position: relative;
+    }
+    .cta-block p {
+      color: var(--dim); font-size: 0.95rem; max-width: 480px;
+      margin: 0 auto 2rem; position: relative;
+    }
+    .cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; }
+
+    /* ─── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border); padding: 1.8rem 0;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-copy {
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      color: var(--dim); letter-spacing: 0.05em;
+    }
+    .footer-copy span { color: var(--accent); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a {
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,210,180,0.3); border-radius: 2px; }
+
+    @media (max-width: 700px) {
+      .meta-strip { grid-template-columns: 1fr 1fr; }
+      .ps-grid    { grid-template-columns: 1fr; }
+      .results-grid { grid-template-columns: 1fr 1fr; }
+      .gallery    { grid-template-columns: 1fr; }
+      .related-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .meta-strip { grid-template-columns: 1fr 1fr; }
+      .results-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+  <div class="nav-logo">SD<span>.</span></div>
+  <a href="../index.html" class="nav-back">Back to Portfolio</a>
+</nav>
+
+<div class="wrapper">
+
+  <!-- ══ HERO ════════════════════════════════════════════════════ -->
+  <section id="hero">
+    <div class="breadcrumb">Portfolio <span>/</span> Biomedical AI <span>/</span> Project 01</div> <!-- ← EDIT THIS -->
+    <div class="project-category">Biomedical AI</div> <!-- ← EDIT THIS: Biomedical AI | AI/LLM | Full-Stack | Data Science -->
+    <h1 class="project-title">Histology Image Classifier</h1> <!-- ← EDIT THIS -->
+    <p class="project-tagline">
+      A ResNet-50 CNN trained on TCGA H&amp;E stained slides that classifies tumor
+      vs. normal tissue at 94% accuracy, with Grad-CAM explainability overlays
+      revealing exactly which regions drove each prediction.
+    </p> <!-- ← EDIT THIS -->
+    <div class="hero-actions">
+      <a href="https://github.com/YOUR_USERNAME/project-repo" target="_blank" class="btn-primary"> <!-- ← EDIT THIS -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        View on GitHub
+      </a>
+      <a href="https://your-demo-link.streamlit.app" target="_blank" class="btn-outline"> <!-- ← EDIT THIS (or remove if no demo) -->
+        ↗ Live Demo
+      </a>
+      <a href="#" target="_blank" class="btn-outline"> <!-- ← EDIT THIS (or remove if no paper) -->
+        📄 Paper / Report
+      </a>
+    </div>
+
+    <!-- META STRIP -->
+    <div class="meta-strip">
+      <div class="meta-item">
+        <div class="meta-label">Category</div>
+        <div class="meta-value">Biomedical AI</div> <!-- ← EDIT THIS -->
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Status</div>
+        <div class="meta-value" style="color:var(--accent)">Complete ✓</div> <!-- ← EDIT: Complete | In Progress | Demo -->
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Duration</div>
+        <div class="meta-value">4 Weeks</div> <!-- ← EDIT THIS -->
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Key Result</div>
+        <div class="meta-value">94% Accuracy</div> <!-- ← EDIT THIS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ DEMO IMAGE ══════════════════════════════════════════════ -->
+  <div class="demo-block reveal">
+    <!-- OPTION A: Use a screenshot → replace src -->
+    <!-- <img src="../assets/images/project-01-demo.png" alt="Histology Classifier Demo"/> -->
+
+    <!-- OPTION B: Placeholder (remove when you have a real image) -->
+    <div class="demo-placeholder">
+      <div class="demo-placeholder-icon">🔬</div>
+      <div class="demo-placeholder-text">Add screenshot or GIF of your project here</div>
+    </div>
+    <div class="demo-caption">
+      Fig 1. Grad-CAM heatmap overlaid on H&amp;E stained slide — model attends to
+      nuclear pleomorphism and increased mitotic figures in tumor regions.
+    </div> <!-- ← EDIT THIS -->
+  </div>
+
+  <!-- ══ PROBLEM / SOLUTION ══════════════════════════════════════ -->
+  <section class="reveal">
+    <div class="section-tag">Context</div>
+    <h2 class="section-h2">Problem &amp; Solution</h2>
+    <div class="ps-grid">
+      <div class="ps-card problem">
+        <div class="ps-label">⚠ The Problem</div>
+        <p>
+          Manual pathologist review of H&amp;E stained histology slides is time-consuming,
+          expensive, and subject to significant inter-observer variability.
+          High-throughput screening pipelines are blocked by this bottleneck.
+        </p> <!-- ← EDIT THIS -->
+      </div>
+      <div class="ps-card solution">
+        <div class="ps-label">✓ The Solution</div>
+        <p>
+          A fine-tuned ResNet-50 classifier that processes a slide image in under 2 seconds
+          and outputs a class probability with a Grad-CAM heatmap overlay, enabling
+          rapid first-pass screening and transparent decision support.
+        </p> <!-- ← EDIT THIS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ APPROACH ════════════════════════════════════════════════ -->
+  <section class="reveal">
+    <div class="section-tag">Methodology</div>
+    <h2 class="section-h2">Technical Approach</h2>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h4>Data Collection &amp; Preprocessing</h4>
+          <p>
+            Downloaded 2,400 labeled H&amp;E slide patches from the TCGA dataset (1,200 tumor,
+            1,200 normal). Applied stain normalization using Macenko's method and tiled each
+            WSI into 256×256px patches at 20× magnification.
+          </p> <!-- ← EDIT THIS -->
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h4>Model Architecture &amp; Training</h4>
+          <p>
+            Used ImageNet-pretrained ResNet-50 with a custom classification head. Trained with
+            AdamW optimizer (lr=1e-4), cosine annealing scheduler, and aggressive augmentation
+            (random flip, rotation, color jitter, elastic deformation) over 30 epochs.
+          </p> <!-- ← EDIT THIS -->
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h4>Explainability with Grad-CAM</h4>
+          <p>
+            Implemented Grad-CAM++ on the final convolutional block to generate per-prediction
+            heatmaps. Heatmaps are upsampled to original image size and blended at 40% opacity.
+            Validated that model attends to clinically relevant regions (nuclear atypia,
+            mitotic figures) confirmed by a pathologist collaborator.
+          </p> <!-- ← EDIT THIS -->
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h4>Deployment</h4>
+          <p>
+            Packaged as a Streamlit app with drag-and-drop image upload, class probability
+            bar chart, and downloadable Grad-CAM overlay. Containerized with Docker for
+            reproducibility. Also exposes a FastAPI endpoint for programmatic access.
+          </p> <!-- ← EDIT THIS -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ RESULTS ══════════════════════════════════════════════════ -->
+  <section class="reveal">
+    <div class="section-tag">Outcomes</div>
+    <h2 class="section-h2">Results</h2>
+    <div class="results-grid">
+      <div class="result-card">
+        <div class="result-num">94<span style="font-size:1.2rem;color:var(--dim)">%</span></div>
+        <div class="result-label">Test Accuracy</div>
+      </div>
+      <div class="result-card">
+        <div class="result-num">0.97</div>
+        <div class="result-label">AUC-ROC Score</div>
+      </div>
+      <div class="result-card">
+        <div class="result-num">&lt;2s</div>
+        <div class="result-label">Inference Time</div>
+      </div>
+    </div> <!-- ← EDIT THIS: change numbers and labels to match your actual results -->
+  </section>
+
+  <!-- ══ CODE SNIPPET ═════════════════════════════════════════════ -->
+  <section class="reveal">
+    <div class="section-tag">Code</div>
+    <h2 class="section-h2">Key Implementation</h2>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>
+        <div class="code-title">gradcam_inference.py</div> <!-- ← EDIT THIS -->
+      </div>
+      <pre><code><span class="cm"># ← EDIT THIS: Replace with a real, meaningful snippet from your project</span>
+
+<span class="kw">import</span> torch
+<span class="kw">from</span> torchvision <span class="kw">import</span> transforms
+<span class="kw">from</span> pytorch_grad_cam <span class="kw">import</span> GradCAMPlusPlus
+
+<span class="kw">def</span> <span class="fn">predict_with_gradcam</span>(model, image_path, device<span class="nb">=</span><span class="str">"cuda"</span>):
+    <span class="cm">"""Run inference and return class + Grad-CAM heatmap."""</span>
+    transform <span class="nb">=</span> transforms.Compose([
+        transforms.Resize((<span class="nb">256</span>, <span class="nb">256</span>)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean<span class="nb">=</span>[<span class="nb">0.485</span>, <span class="nb">0.456</span>, <span class="nb">0.406</span>],
+                             std<span class="nb">=</span>[<span class="nb">0.229</span>, <span class="nb">0.224</span>, <span class="nb">0.225</span>])
+    ])
+    img   <span class="nb">=</span> transform(Image.open(image_path)).unsqueeze(<span class="nb">0</span>).to(device)
+    model <span class="nb">=</span> model.to(device).eval()
+
+    cam   <span class="nb">=</span> GradCAMPlusPlus(model<span class="nb">=</span>model,
+                              target_layers<span class="nb">=</span>[model.layer4[<span class="nb">-1</span>]])
+    mask  <span class="nb">=</span> cam(input_tensor<span class="nb">=</span>img)[<span class="nb">0</span>]   <span class="cm"># (H, W) heatmap</span>
+
+    <span class="kw">with</span> torch.no_grad():
+        logits <span class="nb">=</span> model(img)
+        probs  <span class="nb">=</span> torch.softmax(logits, dim<span class="nb">=1</span>).cpu().numpy()[<span class="nb">0</span>]
+
+    <span class="kw">return</span> {<span class="str">"class"</span>: CLASSES[probs.argmax()],
+            <span class="str">"confidence"</span>: <span class="fn">float</span>(probs.max()),
+            <span class="str">"heatmap"</span>: mask}
+</code></pre>
+    </div>
+  </section>
+
+  <!-- ══ GALLERY ══════════════════════════════════════════════════ -->
+  <section class="reveal">
+    <div class="section-tag">Visuals</div>
+    <h2 class="section-h2">Screenshots &amp; Figures</h2>
+    <div class="gallery">
+      <div class="gallery-item">
+        <!-- <img src="../assets/images/p01-fig1.png" alt="Training curves"/> -->
+        <div class="gallery-placeholder"><span>📈</span></div>
+        <div class="gallery-caption">Training &amp; Validation Loss Curves</div>
+      </div>
+      <div class="gallery-item">
+        <!-- <img src="../assets/images/p01-fig2.png" alt="Confusion matrix"/> -->
+        <div class="gallery-placeholder"><span>🟦</span></div>
+        <div class="gallery-caption">Confusion Matrix — Test Set</div>
+      </div>
+      <div class="gallery-item">
+        <!-- <img src="../assets/images/p01-fig3.png" alt="Grad-CAM examples"/> -->
+        <div class="gallery-placeholder"><span>🔥</span></div>
+        <div class="gallery-caption">Grad-CAM Heatmap Examples</div>
+      </div>
+      <div class="gallery-item">
+        <!-- <img src="../assets/images/p01-fig4.png" alt="Streamlit UI"/> -->
+        <div class="gallery-placeholder"><span>🖥</span></div>
+        <div class="gallery-caption">Streamlit App Interface</div>
+      </div>
+    </div> <!-- ← EDIT THIS: swap placeholders for real screenshots -->
+  </section>
+
+  <!-- ══ CHALLENGES ═══════════════════════════════════════════════ -->
+  <section class="reveal">
+    <div class="section-tag">Learnings</div>
+    <h2 class="section-h2">Challenges &amp; How I Solved Them</h2>
+    <div class="challenges">
+      <div class="challenge-item">
+        <div class="challenge-icon">🎨</div>
+        <div class="challenge-text">
+          <h4>Stain Variability Across Institutions</h4>
+          <p>H&amp;E staining protocols differ between labs, causing distribution shift. Solved by applying Macenko stain normalization at the preprocessing step, reducing cross-site accuracy drop from 12% to 3%.</p>
+        </div>
+      </div>
+      <div class="challenge-item">
+        <div class="challenge-icon">⚖️</div>
+        <div class="challenge-text">
+          <h4>Class Imbalance in Edge Cases</h4>
+          <p>Borderline lesion patches were underrepresented. Addressed with focal loss (γ=2) and oversampling of the minority class during training, improving recall from 81% to 91% on difficult cases.</p>
+        </div>
+      </div>
+      <div class="challenge-item">
+        <div class="challenge-icon">⚡</div>
+        <div class="challenge-text">
+          <h4>Inference Speed for Whole-Slide Images</h4>
+          <p>WSIs contain thousands of patches; naive inference was too slow. Implemented batched tile processing with a CUDA-enabled DataLoader, reducing whole-slide inference from 4 minutes to 22 seconds.</p>
+        </div>
+      </div>
+    </div> <!-- ← EDIT THIS: replace with your real challenges -->
+  </section>
+
+  <!-- ══ TECH STACK ════════════════════════════════════════════════ -->
+  <section class="reveal">
+    <div class="section-tag">Technology</div>
+    <h2 class="section-h2">Full Tech Stack</h2>
+    <div class="stack-section">
+      <div class="stack-groups">
+        <div class="stack-row">
+          <div class="stack-row-label">ML / DL</div>
+          <div class="stack-chips">
+            <span class="stack-chip">PyTorch 2.1</span>
+            <span class="stack-chip">torchvision</span>
+            <span class="stack-chip">pytorch-grad-cam</span>
+            <span class="stack-chip">scikit-learn</span>
+          </div>
+        </div>
+        <div class="stack-row">
+          <div class="stack-row-label">Image Processing</div>
+          <div class="stack-chips">
+            <span class="stack-chip">OpenCV</span>
+            <span class="stack-chip">Pillow</span>
+            <span class="stack-chip">Albumentations</span>
+            <span class="stack-chip">OpenSlide</span>
+          </div>
+        </div>
+        <div class="stack-row">
+          <div class="stack-row-label">Backend</div>
+          <div class="stack-chips">
+            <span class="stack-chip">FastAPI</span>
+            <span class="stack-chip">Uvicorn</span>
+            <span class="stack-chip">Docker</span>
+          </div>
+        </div>
+        <div class="stack-row">
+          <div class="stack-row-label">Frontend / UI</div>
+          <div class="stack-chips">
+            <span class="stack-chip">Streamlit</span>
+            <span class="stack-chip">Plotly</span>
+          </div>
+        </div>
+        <div class="stack-row">
+          <div class="stack-row-label">Data</div>
+          <div class="stack-chips">
+            <span class="stack-chip">TCGA Dataset</span>
+            <span class="stack-chip">pandas</span>
+            <span class="stack-chip">numpy</span>
+          </div>
+        </div>
+      </div>
+    </div> <!-- ← EDIT THIS: update with your actual stack -->
+  </section>
+
+  <!-- ══ RELATED PROJECTS ══════════════════════════════════════════ -->
+  <section class="reveal">
+    <div class="section-tag">See Also</div>
+    <h2 class="section-h2">Related Projects</h2>
+    <div class="related-grid">
+      <div class="related-card">
+        <div class="related-num">02</div>
+        <h4>Cell Segmentation with U-Net</h4>
+        <p>Semantic segmentation of nuclei and cytoplasm in fluorescence microscopy images.</p>
+        <a href="./project-02.html" class="related-link">View Project →</a>
+      </div>
+      <div class="related-card">
+        <div class="related-num">03</div>
+        <h4>Spermatogenesis Stage Predictor</h4>
+        <p>Automated staging of mouse seminiferous tubules from bright-field histology.</p>
+        <a href="./project-03.html" class="related-link">View Project →</a>
+      </div>
+      <div class="related-card">
+        <div class="related-num">19</div>
+        <h4>Grad-CAM Explainability Visualizer</h4>
+        <p>Universal Grad-CAM tool for any PyTorch CNN with layer selection.</p>
+        <a href="./project-19.html" class="related-link">View Project →</a>
+      </div>
+    </div> <!-- ← EDIT THIS: link to your 3 most relevant other projects -->
+  </section>
+
+  <!-- ══ CTA ══════════════════════════════════════════════════════ -->
+  <div class="cta-block reveal">
+    <h3>Need something similar built?</h3>
+    <p>I'm available for freelance projects in biomedical AI, deep learning, and scientific software. Let's talk about your use case.</p>
+    <div class="cta-actions">
+      <a href="../index.html#contact" class="btn-primary">Get In Touch</a>
+      <a href="../index.html#projects" class="btn-outline">View All Projects</a>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ════════════════════════════════════════════════════ -->
+  <footer>
+    <div class="footer-copy">© 2025 <span>Sounak Dey</span> — AI &amp; Computational Biology Engineer</div>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <a href="https://github.com/YOUR_USERNAME" target="_blank">GitHub</a>
+      <a href="mailto:your.email@gmail.com">Email</a>
+    </div>
+  </footer>
+
+</div><!-- /wrapper -->
+
+<script>
+  /* ── PARTICLES ─────────────────────────────── */
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, particles = [];
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = Math.random()*W; this.y = Math.random()*H;
+      this.r = Math.random()*1.2+0.3;
+      this.vx = (Math.random()-.5)*.2; this.vy = (Math.random()-.5)*.2;
+      this.a = Math.random()*.4+.1;
+      this.color = ['0,210,180','0,168,255','123,97,255'][Math.floor(Math.random()*3)];
+    }
+    update() { this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>W||this.y<0||this.y>H) this.reset(); }
+    draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fillStyle=`rgba(${this.color},${this.a})`; ctx.fill(); }
+  }
+  function init() { particles=[]; const n=Math.min(Math.floor(W*H/10000),80); for(let i=0;i<n;i++) particles.push(new Particle()); }
+  function animate() { ctx.clearRect(0,0,W,H); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(animate); }
+  window.addEventListener('resize',()=>{resize();init();});
+  resize(); init(); animate();
+
+  /* ── SCROLL REVEAL ──────────────────────────── */
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e,i) => {
+      if(e.isIntersecting) { setTimeout(()=>e.target.classList.add('visible'), i*60); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
