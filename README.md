@@ -125,6 +125,7 @@ Research Consulting          →  Architecture review, experimental design, tech
 
 ---
 
+<!-- 
 ## Repo Structure
 
 ```
@@ -188,18 +189,18 @@ git push origin main
 5. Add the row to the table in this README
 6. Push to `main`
 
----
+-->
 
-## Contact
+## Contact: heisenberg.systems@gmail.com
 
 I'm currently available for **part-time freelance projects**.
 
 | Channel | Link |
 |---------|------|
-| 📧 Email | [your.email@gmail.com](mailto:your.email@gmail.com) |
-| 💼 LinkedIn | [linkedin.com/in/YOUR_LINKEDIN](https://linkedin.com/in/YOUR_LINKEDIN) |
+| 📧 Email | [your.email@gmail.com](mailto:heisenberg.systems@gmail.com) |
+| 💼 LinkedIn | [linkedin.com/in/YOUR_LINKEDIN]([https://www.linkedin.com/in/sounak-sadhukhan-ph-d-a47809393/]) |
 | 🔧 Upwork | [upwork.com/freelancers/YOUR_ID](https://upwork.com/freelancers/YOUR_ID) |
-| 🌐 Portfolio | [YOUR_USERNAME.github.io](https://YOUR_USERNAME.github.io) |
+| 🌐 Portfolio | [YOUR_USERNAME.github.io](https://sounak-dev.github.io) |
 
 Typical response time: **within 24 hours**.
 
