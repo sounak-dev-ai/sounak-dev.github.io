@@ -199,7 +199,7 @@ I'm currently available for **part-time freelance projects**.
 |---------|------|
 | 📧 Email | [heisenberg.systems@gmail.com](mailto:heisenberg.systems@gmail.com) |
 | 💼 LinkedIn | [linkedin.com/in//sounak-sadhukhan-ph-d-a47809393/]([https://www.linkedin.com/in/sounak-sadhukhan-ph-d-a47809393/]) |
-| 🔧 Upwork | [upwork.com/freelancers/YOUR_ID](https://upwork.com/freelancers/YOUR_ID) |
+| 🔧 Upwork | [https://www.upwork.com/freelancers/~018a083b6fded0ab14](https://www.upwork.com/freelancers/~018a083b6fded0ab14) |
 | 🌐 Portfolio | [sounak-dev.github.io](https://sounak-dev.github.io) |
 
 Typical response time: **within 24 hours**.
